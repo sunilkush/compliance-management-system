@@ -9,6 +9,7 @@ const userSchema = new mongoose.Schema(
     password: { type: String, required: true },
     role: { type: String, enum: Object.values(ROLES), required: true },
     entityId: { type: String, required: true, default: 'HQ' },
+    refreshTokenHash: { type: String },
     resetPasswordToken: { type: String },
     resetPasswordExpires: { type: Date }
   },

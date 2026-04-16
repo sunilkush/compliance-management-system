@@ -1,39 +1,105 @@
 require('dotenv').config({ path: '.env' });
 const connectDB = require('../config/db');
 const User = require('../models/User');
-const ComplianceItem = require('../models/ComplianceItem');
+const Policy = require('../models/Policy');
+const Risk = require('../models/Risk');
+const Task = require('../models/Task');
+const Audit = require('../models/Audit');
+const Training = require('../models/Training');
 const { ROLES } = require('../utils/constants');
 
 const users = [
-  { name: 'System Admin', email: 'admin@corp.com', role: ROLES.ADMIN, password: 'Password123!', entityId: 'HQ' },
+  { name: 'Platform Super Admin', email: 'admin@corp.com', role: ROLES.SUPER_ADMIN, password: 'Password123!', entityId: 'HQ' },
   { name: 'Chief Compliance Officer', email: 'cco@corp.com', role: ROLES.COMPLIANCE_OFFICER, password: 'Password123!', entityId: 'HQ' },
-  { name: 'Internal Auditor', email: 'auditor@corp.com', role: ROLES.AUDITOR, password: 'Password123!', entityId: 'HQ' },
-  { name: 'Control Owner', email: 'owner@corp.com', role: ROLES.CONTROL_OWNER, password: 'Password123!', entityId: 'HQ' },
+  { name: 'Legal Risk Manager', email: 'legal@corp.com', role: ROLES.LEGAL_RISK_MANAGER, password: 'Password123!', entityId: 'HQ' },
+  { name: 'Internal Auditor', email: 'auditor@corp.com', role: ROLES.INTERNAL_AUDITOR, password: 'Password123!', entityId: 'HQ' },
+  { name: 'Department Manager', email: 'manager@corp.com', role: ROLES.DEPARTMENT_MANAGER, password: 'Password123!', entityId: 'HQ' },
   { name: 'Employee User', email: 'employee@corp.com', role: ROLES.EMPLOYEE, password: 'Password123!', entityId: 'HQ' },
+  { name: 'External Auditor', email: 'external.auditor@corp.com', role: ROLES.EXTERNAL_AUDITOR, password: 'Password123!', entityId: 'HQ' },
   { name: 'Executive Sponsor', email: 'exec@corp.com', role: ROLES.EXECUTIVE, password: 'Password123!', entityId: 'HQ' }
-];
-
-const items = [
-  { type: 'OBLIGATION', title: 'GDPR Article 32 Security of Processing', status: 'OPEN', frameworkTags: ['GDPR', 'ISO27001'], region: 'EU', metadata: { penalties: 'Up to 2% global turnover', controlIds: ['CTRL-001'] }, entityId: 'HQ' },
-  { type: 'POLICY', title: 'Information Security Policy v2.1', status: 'PUBLISHED', frameworkTags: ['ISO27001', 'SOC2'], region: 'GLOBAL', metadata: { acknowledgementRate: 86 }, entityId: 'HQ' },
-  { type: 'CONTROL', title: 'Quarterly Access Review', status: 'IN_PROGRESS', frameworkTags: ['SOX', 'SOC2'], region: 'US', metadata: { frequency: 'QUARTERLY', procedure: 'Review IAM group access and recertify.' }, entityId: 'HQ' },
-  { type: 'RISK', title: 'Privileged account sprawl', status: 'OPEN', riskScore: 15, frameworkTags: ['NIST-CSF'], region: 'GLOBAL', dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 20), entityId: 'HQ' },
-  { type: 'INCIDENT', title: 'Whistleblower hotline case #WB-104', status: 'TRIAGE', frameworkTags: ['SOX'], region: 'US', metadata: { confidentiality: 'STRICT', channel: 'Hotline' }, entityId: 'HQ' },
-  { type: 'TRAINING', title: 'Annual Code of Conduct Certification', status: 'OPEN', frameworkTags: ['SOX', 'CCPA'], region: 'GLOBAL', metadata: { recertificationCadenceMonths: 12, completionRate: 73 }, entityId: 'HQ' },
-  { type: 'VENDOR', title: 'CloudCRM Vendor Reassessment', status: 'OPEN', frameworkTags: ['GDPR', 'PCI-DSS'], region: 'EU', metadata: { riskTier: 'HIGH', nextAssessment: '2026-07-30' }, entityId: 'HQ' },
-  { type: 'AUDIT', title: 'SOC 2 Type II Readiness - Q3', status: 'PLANNED', frameworkTags: ['SOC2'], region: 'GLOBAL', metadata: { findingsOpen: 5 }, entityId: 'HQ' }
 ];
 
 const run = async () => {
   await connectDB();
-  await User.deleteMany({});
-  await ComplianceItem.deleteMany({});
+  await Promise.all([
+    User.deleteMany({}),
+    Policy.deleteMany({}),
+    Risk.deleteMany({}),
+    Task.deleteMany({}),
+    Audit.deleteMany({}),
+    Training.deleteMany({})
+  ]);
 
   const createdUsers = await User.insertMany(users);
-  const owner = createdUsers.find((user) => user.role === ROLES.CONTROL_OWNER);
+  const owner = createdUsers.find((user) => user.role === ROLES.COMPLIANCE_OFFICER);
 
-  const enrichedItems = items.map((item) => ({ ...item, owner: owner._id }));
-  await ComplianceItem.insertMany(enrichedItems);
+  await Policy.insertMany([
+    {
+      title: 'Information Security Policy',
+      category: 'SECURITY',
+      content: 'Policy baseline for GDPR, HIPAA, ISO 27001, and SOC 2.',
+      status: 'APPROVED',
+      owner: owner._id,
+      frameworkTags: ['GDPR', 'HIPAA', 'ISO27001', 'SOC2'],
+      entityId: 'HQ'
+    }
+  ]);
+
+  await Risk.insertMany([
+    {
+      title: 'Privileged account sprawl',
+      description: 'Unreviewed admin access across business systems.',
+      category: 'IT',
+      likelihood: 4,
+      impact: 5,
+      residualLikelihood: 3,
+      residualImpact: 3,
+      mitigationPlan: 'Quarterly access recertification and PAM rollout',
+      owner: owner._id,
+      frameworkTags: ['ISO27001', 'SOC2'],
+      entityId: 'HQ'
+    }
+  ]);
+
+  await Task.insertMany([
+    {
+      title: 'Complete SOC2 evidence collection',
+      module: 'AUDIT',
+      priority: 'HIGH',
+      status: 'IN_PROGRESS',
+      dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 10),
+      assignee: owner._id,
+      reminderChannels: ['EMAIL'],
+      entityId: 'HQ'
+    }
+  ]);
+
+  await Audit.insertMany([
+    {
+      name: 'SOC 2 Type II Readiness',
+      auditType: 'INTERNAL',
+      frameworks: ['SOC2'],
+      periodStart: new Date('2026-01-01'),
+      periodEnd: new Date('2026-03-31'),
+      status: 'ACTIVE',
+      auditor: owner._id,
+      findings: [{ severity: 'HIGH', title: 'Missing access review evidence', evidenceRefs: ['EV-001'], capAction: 'Implement quarterly review', status: 'OPEN' }],
+      entityId: 'HQ'
+    }
+  ]);
+
+  await Training.insertMany([
+    {
+      title: 'Annual Privacy Awareness',
+      topic: 'GDPR Basics',
+      audienceRole: ROLES.EMPLOYEE,
+      mandatory: true,
+      dueDate: new Date(Date.now() + 1000 * 60 * 60 * 24 * 30),
+      assignedUsers: [createdUsers.find((u) => u.role === ROLES.EMPLOYEE)._id],
+      completedUsers: [],
+      entityId: 'HQ'
+    }
+  ]);
 
   console.log('Seed complete');
   process.exit(0);

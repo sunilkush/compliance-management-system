@@ -2,10 +2,11 @@ const KpiCards = ({ data }) => {
   if (!data) return null;
 
   const cards = [
-    { label: 'Total Records', value: data.totalRecords },
-    { label: 'High Risk Open Issues', value: data.highRiskOpenIssues },
-    { label: 'Obligations Mapped %', value: `${data.obligationsMappedPct}%` },
-    { label: 'Overdue Actions', value: data.overdueActions }
+    { label: 'Compliance Score', value: `${data.complianceScore}%` },
+    { label: 'Open Risks', value: data.openRisks },
+    { label: 'Overdue Tasks', value: data.overdueTasks },
+    { label: 'Active Audits', value: data.activeAudits },
+    { label: 'Policy Approval', value: `${data.policyApprovalPct}%` }
   ];
 
   return (
