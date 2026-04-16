@@ -37,7 +37,7 @@ body {
 }
 
 .grid.two {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .card {
@@ -46,6 +46,22 @@ body {
   box-shadow: 0 2px 8px rgba(8, 30, 66, 0.08);
   padding: 1rem;
   width: min(560px, 100%);
+}
+
+.wide-card {
+  width: 100%;
+}
+
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+}
+
+.module-tile {
+  border: 1px solid #e2e8f2;
+  border-radius: 10px;
+  padding: 0.75rem;
 }
 
 .kpi {
@@ -128,4 +144,13 @@ button {
 
 .role-card ul {
   margin: 0.25rem 0 0;
+}
+
+.json-preview {
+  margin-top: 1rem;
+  background: #0c1b33;
+  color: #ebf3ff;
+  padding: 0.75rem;
+  border-radius: 8px;
+  overflow: auto;
 }

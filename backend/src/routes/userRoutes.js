@@ -1,17 +1,13 @@
 const express = require('express');
-const { getAuditLogs } = require('../controllers/auditController');
+const { listUsers, updateUserRole } = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
 const { scopeByEntity } = require('../middleware/entityScope');
 const { ROLES } = require('../utils/constants');
 
 const router = express.Router();
+router.use(protect, scopeByEntity, authorize(ROLES.SUPER_ADMIN, ROLES.COMPLIANCE_OFFICER));
 
-router.get(
-  '/',
-  protect,
-  scopeByEntity,
-  authorize(ROLES.SUPER_ADMIN, ROLES.COMPLIANCE_OFFICER, ROLES.INTERNAL_AUDITOR, ROLES.EXTERNAL_AUDITOR),
-  getAuditLogs
-);
+router.get('/', listUsers);
+router.patch('/:id/role', updateUserRole);
 
 module.exports = router;
