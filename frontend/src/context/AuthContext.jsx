@@ -18,6 +18,28 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(data.user));
   };
 
+  const signup = async ({ name, email, password }) => {
+    const { data } = await api.post('/auth/signup', { name, email, password });
+    setToken(data.token);
+    setUser(data.user);
+    setAuthToken(data.token);
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
+  };
+
+  const forgotPassword = async (email) => {
+    const { data } = await api.post('/auth/forgot-password', { email });
+    return data;
+  };
+
+  const resetPassword = async ({ token: resetToken, newPassword }) => {
+    const { data } = await api.post('/auth/reset-password', {
+      token: resetToken,
+      newPassword
+    });
+    return data;
+  };
+
   const logout = () => {
     setToken(null);
     setUser(null);
@@ -27,7 +49,16 @@ export const AuthProvider = ({ children }) => {
   };
 
   const value = useMemo(
-    () => ({ token, user, login, logout, isAuthenticated: Boolean(token) }),
+    () => ({
+      token,
+      user,
+      login,
+      signup,
+      forgotPassword,
+      resetPassword,
+      logout,
+      isAuthenticated: Boolean(token)
+    }),
     [token, user]
   );
 

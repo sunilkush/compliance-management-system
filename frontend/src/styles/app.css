@@ -45,6 +45,7 @@ body {
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(8, 30, 66, 0.08);
   padding: 1rem;
+  width: min(560px, 100%);
 }
 
 .kpi {
@@ -99,6 +100,30 @@ button {
 
 .error {
   color: #c61d1d;
+}
+
+.success {
+  color: #0b7d36;
+  word-break: break-all;
+}
+
+.auth-modes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.auth-modes button {
+  width: 100%;
+  margin-top: 0;
+  background: #dce6f8;
+  color: #17376d;
+}
+
+.auth-modes button.active {
+  background: #0e3a7d;
+  color: #fff;
 }
 
 .role-card ul {
